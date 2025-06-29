@@ -62,32 +62,46 @@
             const deadline = getDeadline();
             console.log("Дедлайн:", deadline.toUTCString());
 
-
             function updateTimer() {
                 const now = new Date();
                 const diff = deadline - now;
 
+                // Получаем элементы DOM
+                const daysEl = document.getElementById('days');
+                const hoursEl = document.getElementById('hours');
+                const minutesEl = document.getElementById('minutes');
+                const secondsEl = document.getElementById('seconds');
+                const urgencyTag = document.querySelector('.urgency-tag');
+
                 // Если время вышло
                 if (diff <= 0) {
-                    document.getElementById("days").textContent = "00";
-                    document.getElementById("hours").textContent = "00";
-                    document.getElementById("minutes").textContent = "00";
-                    document.getElementById("seconds").textContent = "00";
+                    daysEl.textContent = '00';
+                    hoursEl.textContent = '00';
+                    minutesEl.textContent = '00';
+                    secondsEl.textContent = '00';
+                    urgencyTag.textContent = 'Время истекло!';
+                    urgencyTag.style.background = '#f44336';
                     return;
                 }
 
-                // Более точный расчет с учетом "текущего дня"
-                const totalSeconds = Math.floor(diff / 1000);
-                const days = Math.ceil(totalSeconds / (3600 * 24)); // Используем Math.ceil вместо Math.floor
-                const hours = Math.floor((totalSeconds % (3600 * 24)) / 3600);
-                const minutes = Math.floor((totalSeconds % 3600) / 60);
-                const seconds = totalSeconds % 60;
+                // Расчет времени в UTC
+                const totalSec = Math.floor(diff / 1000);
+                const days = Math.floor(totalSec / (3600 * 24));
+                const hours = Math.floor((totalSec % (3600 * 24)) / 3600);
+                const mins = Math.floor((totalSec % 3600) / 60);
+                const secs = totalSec % 60;
 
-                // Обновляем отображение
-                document.getElementById("days").textContent = days.toString().padStart(2, '0');
-                document.getElementById("hours").textContent = hours.toString().padStart(2, '0');
-                document.getElementById("minutes").textContent = minutes.toString().padStart(2, '0');
-                document.getElementById("seconds").textContent = seconds.toString().padStart(2, '0');
+                // Обновление таймера
+                daysEl.textContent = days.toString().padStart(2, '0');
+                hoursEl.textContent = hours.toString().padStart(2, '0');
+                minutesEl.textContent = mins.toString().padStart(2, '0');
+                secondsEl.textContent = secs.toString().padStart(2, '0');
+
+                // Эффект срочности
+                if (days === 0 && hours < 3) {
+                    document.querySelector('.burn-timer').style.background = '#ffebee';
+                    urgencyTag.style.animation = 'pulse 0.5s infinite';
+                }
             }
 
             setInterval(updateTimer, 1000);
